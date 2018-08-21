@@ -1,0 +1,9 @@
+ldap:
+  ldapServer: "example.com" # the server you are contacting for names. Probably an Active Directory domain
+  ldapAccessDomain: "example"
+  ldapAccessUserName: "Administrator" # don't use a 'good' user account here. It should be a service account/unprivledged account...
+  ldapAccessPassword: "Passw0rd!" # because the password is in plaintext.
+  ldapSearchBase: "DC=example, DC=com" # where you want searches to start. There probably isn't a reason not to do all of AD unless you have a heckton (over a million) accounts.
+
+general:
+  signIn: "yes" # do you want a sign-in page to pop up?
