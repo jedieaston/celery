@@ -1,11 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Celery</title>
-    <h1>Celery</h1>
-</head>
-<body>
-<p>There's nothing here yet....</p>
-</body>
-</html>
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+    Celery!
+{% endblock %}
+
+{% block navbar %}
+{{ nav.celeryNav.render() }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% if alertState == "0" %}
+
+        {% elif alertState == "1" %}
+            <div class="alert alert-success" role="alert">
+                Sign-in recorded!
+            </div>
+        {% elif alertState == "2" %}
+            <div class="alert alert-danger" role="alert">
+                We could not record your sign in. Contact your favorite IT Intern so he can fix it.
+            </div>
+        {% elif alertState == "4" %}
+            <div class="alert alert-danger" role="alert">
+                Sign-in prompt overridden. This incident has been recorded.
+            </div>
+        {% endif %}
+        <form method="post" action="{{ url_for('home') }}">
+                <dl>
+                    {{ wtf.quick_form(form) }}
+                </dl>
+            <button type="submit" class="btn btn-success">Submit</button>
+            </form>
+    </div>
+
+{% endblock %}

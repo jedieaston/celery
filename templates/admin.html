@@ -1,0 +1,17 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}
+    Celery!
+{% endblock %}
+
+{% block navbar %}
+{{ nav.celeryNav.render() }}
+{% endblock %}
+
+{% block content %}
+<h1>Celery Admin</h1>
+<div class="container">
+    <p>Welcome to Celery's admin page. There isn't much here yet, but you can do a few things....</p>
+    <a class="btn btn-primary" href="{{ "/static/logs/" + logFile }}" role="button">Export records</a>
+</div>
+
+{% endblock %}

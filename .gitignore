@@ -67,3 +67,4 @@ notebooks/*
 settings.yaml
 .ipynb_checkpoints/*
 .vscode/*
+log-*.csv
