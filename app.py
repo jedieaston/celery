@@ -10,7 +10,7 @@ from flask_nav.elements import Navbar, View, Link
 app = Flask(__name__)
 Bootstrap(app)
 nav = Nav(app)
-session.clear()
+#session.clear()
 logFile = recorder.logFile
 # Change this in prod...
 app.config['SECRET_KEY'] = '84328weyrs78sa78asd76f76sdf56asd75632472y8huiasdfh347924h174y43792hg23r4y77y73247bc'
@@ -20,10 +20,10 @@ nav.register_element('celeryNav', Navbar('Celery', View('Sign in', 'home'),
 
 class signOutForm(FlaskForm):
     idNumber = StringField('ID Number: ', validators=[Length(min=6, max=6, message="That's the wrong length! It should be six characters"),
-                                                     DataRequired(message="This field is required!")])
+                                                     DataRequired(message="This field is required!")], )
 class signInForm(FlaskForm):
     idNumber = StringField('ID Number: ', validators=[Length(min=6, max=8, message="That's the wrong length! It should be six characters unless you are overriding."),
-                                                     DataRequired(message="This field is required!")])
+                                                     DataRequired(message="This field is required!")], render_kw={'autofocus': True})
 
 @app.route('/', methods=["GET", "POST"])
 

@@ -11,6 +11,8 @@ flask-wtf = "*"
 wtforms = "*"
 flask-bootstrap = "*"
 flask-nav = "*"
+sqlalchemy = "*"
+"psycopg2" = "*"
 
 [dev-packages]
 pylint = "*"

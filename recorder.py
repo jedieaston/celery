@@ -15,8 +15,8 @@ def buildCSV():
 def signOut(idNumber):
     record = {}
     record["idNumber"] = idNumber
-    #record["Name"] = ldapConnect.getStudentName(idNumber)
-    record["Name"] = "Mr. Placeholder!"
+    record["Name"] = ldapConnect.getStudentName(idNumber)
+    #record["Name"] = "Mr. Placeholder!"
     timeNow = datetime.datetime.now()
     record["Time Out"] = timeNow.strftime("%m-%d-%Y %H:%M")
     return record
@@ -24,8 +24,8 @@ def signOut(idNumber):
 def signInNoOut(idNumber):
     record = {}
     record["idNumber"] = idNumber
-    # record["Name"] = ldapConnect.getStudentName(idNumber)
-    record["Name"] = "Mr. Placeholder!"
+    record["Name"] = ldapConnect.getStudentName(idNumber)
+    #record["Name"] = "Mr. Placeholder!"
     timeNow = datetime.datetime.now()
     record["Signed in at"] = timeNow.strftime("%m-%d-%Y %H:%M")
     recordsForExport.append(record)
