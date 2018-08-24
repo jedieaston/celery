@@ -9,4 +9,4 @@ ldap:
 general:
   signIn: "yes" # do you want a sign-in page to pop up?
 db:
-  url: "sqlite:///dev.db" # Docs: http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls ; sqlite sucks, use postgres or mysql.
+  url: "postgres+psycopg2://postgres:celery@db:5432" # Docs: http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls ; sqlite sucks, use postgres or mysql.
