@@ -6,7 +6,7 @@ from wtforms.validators import Length, DataRequired
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import Navbar, View
-from modules.dbModels import db
+from modules.dbModels import db, record
 
 app = Flask(__name__)
 # Change this in prod...
@@ -17,10 +17,14 @@ app.config["SQLALCHEMY_DATABASE_URI"] = settings.db["url"]
 
 # Setup flask plugins....
 try:
-    db.init_app(app)
+    with app.app_context():
+        db.init_app(app)
+        db.create_all()
 except:
     print("Can't connect to the database! Check to make sure your settings are correct.")
     exit()
+
+
 Bootstrap(app)
 nav = Nav(app)
 
