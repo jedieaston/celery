@@ -14,6 +14,7 @@ flask-nav = "*"
 sqlalchemy = "*"
 "psycopg2" = "*"
 flask-sqlalchemy = "*"
+gunicorn = "*"
 
 [dev-packages]
 pylint = "*"

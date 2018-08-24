@@ -16,7 +16,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = settings.db["url"]
 #Don't ask why I had to do this....
 
 # Setup flask plugins....
-db.init_app(app)
+try:
+    db.init_app(app)
+except:
+    print("Can't connect to the database! Check to make sure your settings are correct.")
+    exit()
 Bootstrap(app)
 nav = Nav(app)
 
@@ -85,4 +89,4 @@ def reporting():
 
 
 if __name__ == '__main__':
-    app.run(Debug=True, use_reloader=True)
+    app.run()
