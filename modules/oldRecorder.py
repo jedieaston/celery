@@ -2,7 +2,7 @@
 
 
 import csv
-from modules import ldapConnect
+import ldapConnect
 import random
 import string
 import datetime
