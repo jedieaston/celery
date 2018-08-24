@@ -1,9 +1,12 @@
 ldap:
-  ldapServer: "example.com" # the server you are contacting for names. Probably an Active Directory domain
+  ldapServer: "example.com" # the domain/server you are contacting for ldap info. Probably an Active Directory domain
   ldapAccessDomain: "example"
-  ldapAccessUserName: "Administrator" # don't use a 'good' user account here. It should be a service account/unprivledged account...
+  ldapAccessUserName: "Unprivileged" # don't use a 'good' user account here. It should be a service account/unprivledged account...
   ldapAccessPassword: "Passw0rd!" # because the password is in plaintext.
   ldapSearchBase: "DC=example, DC=com" # where you want searches to start. There probably isn't a reason not to do all of AD unless you have a heckton (over a million) accounts.
+  ldapAuthenticationStandard: "NTLM" # what authentication to use with ldap3, https://ldap3.readthedocs.io/connection.html
 
 general:
   signIn: "yes" # do you want a sign-in page to pop up?
+db:
+  url: "sqlite:///dev.db" # Docs: http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls ; sqlite sucks, use postgres or mysql.

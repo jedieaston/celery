@@ -1,8 +1,11 @@
+# This uses csv files without a database. You probably shouldn't use it, since it doesn't work.
+
+
 import csv
-import ldapConnect
-import datetime
+from modules import ldapConnect
 import random
 import string
+import datetime
 logFile = "logs-" + ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(9)) + ".csv"
 recordsForExport = []
 
@@ -20,6 +23,13 @@ def signOut(idNumber):
     timeNow = datetime.datetime.now()
     record["Time Out"] = timeNow.strftime("%m-%d-%Y %H:%M")
     return record
+def signIn(record, override):
+    timeNow = datetime.datetime.now()
+    record["Time in"] = timeNow.strftime("%m-%d-%Y %H:%M")
+    if override == True:
+        record["Overridden"] = "Yes"
+    else:
+        record["Overridden"] = "No"
 
 def signInNoOut(idNumber):
     record = {}
@@ -29,16 +39,3 @@ def signInNoOut(idNumber):
     timeNow = datetime.datetime.now()
     record["Signed in at"] = timeNow.strftime("%m-%d-%Y %H:%M")
     recordsForExport.append(record)
-    buildCSV()
-
-def signIn(record, override):
-    timeNow = datetime.datetime.now()
-    record["Time in"] = timeNow.strftime("%m-%d-%Y %H:%M")
-    if override == "yes":
-        record["Overridden"] = "Yes"
-    else:
-        record["Overridden"] = "No"
-    recordsForExport.append(record)
-    buildCSV()
-
-

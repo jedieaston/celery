@@ -13,6 +13,7 @@ flask-bootstrap = "*"
 flask-nav = "*"
 sqlalchemy = "*"
 "psycopg2" = "*"
+flask-sqlalchemy = "*"
 
 [dev-packages]
 pylint = "*"

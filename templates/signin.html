@@ -13,10 +13,10 @@
     <div class="container">
         {% if alertState == "2" %}
         <div class="alert alert-danger" role="alert">
-            Woah, you aren't {{ currentWorkingRecord["Name"] }}!
+            Woah, you aren't {{ record.studentName }}!
         </div>
         {% endif %}
-        <p>To sign in, you have to be {{ currentWorkingRecord["Name"] }} or override.</p>
+        <p>To sign in, you have to be {{ record.studentName }} or override.</p>
         <form method="post" action="{{ url_for('signin') }}">
                 <dl>
                     {{ wtf.quick_form(form) }}
