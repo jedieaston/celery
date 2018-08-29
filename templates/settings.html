@@ -1,0 +1,53 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}
+    Celery!
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+{% endblock %}
+{% block navbar %}
+{{ nav.celeryNav.render() }}
+{% endblock %}
+
+{% block content %}
+    <h1>Settings</h1>
+        <p>You know, where you change stuff.</p>
+    <div class="container">
+        <h2>General</h2>
+        <form action="" method="POST">
+            <dl>
+                {{ wtf.quick_form(generalSettings) }}
+            </dl>
+        </form>
+    </div>
+    <hr width="100%">
+    <div class="container">
+        <h2>Database</h2>
+            <p>Database settings can be changed from the config/settings.yaml file. They break the web interface,
+                so we don't put them here.</p>
+    </div>
+       <hr width="100%">
+    <div class="container">
+        <h2>Active Directory</h2>
+            <p>Settings for configuring access to Active Directory. Contact your administrator to help you with this.</p>
+            <form action="" method="POST">
+                <dl>
+                    {{ wtf.quick_form(ldapSettings) }}
+                </dl>
+            </form>
+    </div>
+        <hr width="100%">
+    <div class="container">
+        <h2>Schoology API</h2>
+            <p>Settings for configuring access to the Schoology API. Contact your Schoology admin with questions.</p>
+            <form action="{{ url_for('settingsEditor') }}" method="POST">
+                <dl>
+                    {{ wtf.quick_form(schoologySettings) }}
+                </dl>
+            </form>
+    </div>
+
+{% endblock %}

@@ -36,6 +36,7 @@ def signInNoOut(idNumber, db):
                        timeOut=datetime.datetime.today(), overridden=False)
     db.session.add(newRecord)
     db.session.commit()
+    return studentName
 
 
 

@@ -1,4 +1,5 @@
 ldap:
+  ldapAvailable: True
   ldapServer: "example.com" # the domain/server you are contacting for ldap info. Probably an Active Directory domain
   ldapAccessDomain: "example"
   ldapAccessUserName: "Unprivileged" # don't use a 'good' user account here. It should be a service account/unprivledged account...
@@ -7,6 +8,12 @@ ldap:
   ldapAuthenticationStandard: "NTLM" # what authentication to use with ldap3, https://ldap3.readthedocs.io/connection.html
 
 general:
-  signIn: "yes" # do you want a sign-in page to pop up?
+  signIn: True # do you want a sign-in page to pop up?
 db:
-  url: "postgres+psycopg2://postgres:celery@db:5432" # Docs: http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls ; sqlite sucks, use postgres or mysql.
+  url: "postgres+psycopg2://postgres:celery@db:5432/celerydb" # Docs: http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls ; sqlite sucks, use postgres or mysql.
+schoology:
+  instanceUrl: "xaviersschool.schoology.com"
+  apiKey: "buymeatendiesub"
+  apiSecret: "skdfjlasfaslaksdlaslasfasflkasdkf3e4rijowejrf"
+  requestLimit: "5000"
+

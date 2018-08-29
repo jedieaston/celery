@@ -1,12 +1,12 @@
-from modules import recorder, settings
-from flask import Flask, render_template, redirect, url_for, session
-from flask_wtf import FlaskForm
-from wtforms import StringField
-from wtforms.validators import Length, DataRequired
+from modules import settings, recorder
+from flask import Flask, render_template, redirect, url_for, session, request
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import Navbar, View
 from modules.dbModels import db, record
+from modules.forms import signInForm, signOutForm, general, ldap, getSettings
+from modules.forms import schoology as schoologySettings
+import modules.api.schoology as schoology
 
 app = Flask(__name__)
 # Change this in prod...
@@ -32,12 +32,6 @@ nav = Nav(app)
 nav.register_element('celeryNav', Navbar('Celery', View('Sign in', 'home'),
                                          View("Admin Page", 'admin')))
 
-class signOutForm(FlaskForm):
-    idNumber = StringField('ID Number: ', validators=[Length(min=6, max=6, message="That's the wrong length! It should be six characters"),
-                                                     DataRequired(message="This field is required!")], )
-class signInForm(FlaskForm):
-    idNumber = StringField('ID Number: ', validators=[Length(min=6, max=8, message="That's the wrong length! It should be six characters unless you are overriding."),
-                                                     DataRequired(message="This field is required!")], render_kw={'autofocus': True})
 
 @app.route('/', methods=["GET", "POST"])
 
@@ -51,14 +45,14 @@ def home():
         pass
     form = signOutForm()
     if form.validate_on_submit():
-        session["currentOutUser"] = form.idNumber.data
-        if settings.general["signIn"] == "yes":
+        session["lastCheckedUser"] = form.idNumber.data
+        if settings.general["signIn"] == True:
             global record
             record = recorder.signOut(form.idNumber.data)
             return redirect(url_for('signin'))
         else:
             try:
-                recorder.signInNoOut(form.idNumber.data, db)
+                session["lastCheckedUser"] = recorder.signInNoOut(form.idNumber.data, db)
                 alertState = "1"
             except:
                 alertState = "2"
@@ -91,6 +85,30 @@ def signin():
 def reporting():
     return render_template("reporting.html")
 
+@app.route('/admin/schoologyconnect', methods=["GET", "POST"])
+def schoologyConnect():
+    urlForCelery = request.base_url
+    schoologyConnectionCheck = schoology.connectionCheck()
+    schoologyConnectUrl = schoology.authUrl(urlForCelery)
+    return render_template("schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+                           schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology)
 
+@app.route('/admin/settings', methods=["GET", "POST"])
+def settingsEditor():
+    currentGeneralSettings = getSettings(general)
+    genSet = general(**currentGeneralSettings)
+    ldapCurrentSettings = getSettings(ldap)
+    ldapSet = ldap(**ldapCurrentSettings)
+    schoologyCurrentSettings = getSettings(schoologySettings)
+    schoologySet = schoologySettings(**schoologyCurrentSettings)
+    if schoologySet.is_submitted():
+        settings.updateSettingsDicts(schoology=schoologySet.data, ldap=ldapSet.data, general=genSet.data)
+        return ("Saved!")
+        # try:
+        #     settings.updateSettingsDicts(schoology=schoologySet.data, ldap=ldap, general=general)
+        #     return("Saved!")
+        # except:
+        #     settingsSaved = False
+    return render_template("settings.html", generalSettings=genSet, ldapSettings=ldapSet, schoologySettings=schoologySet)
 if __name__ == '__main__':
     app.run()

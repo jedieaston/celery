@@ -1,0 +1,31 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}
+    Celery!
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+{% endblock %}
+{% block navbar %}
+{{ nav.celeryNav.render() }}
+{% endblock %}
+
+
+{% block content %}
+    <h1>Connect to Schoology</h1>
+    {% if schoologyConnectionCheck == False %}
+        <div class="container"></div>
+            <p>To access data from Schoology, we need your permission. Click the button to allow access, and then refresh
+            this page!</p>
+            <a button type="button" class="btn btn-primary" href="{{ schoologyConnectUrl }}">Connect to Schoology</a>
+        </div>
+    {% elif schoologyConnectionCheck == True %}
+        <div class="alert alert-success" role="alert">
+            <i class="fas fa-check"></i>
+            We have your authorization, {{ schoology.sc.get_me().name_first }}. Schoology integration is good to go!
+        </div>
+    {% endif %}
+{% endblock %}
+
+

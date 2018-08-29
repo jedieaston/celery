@@ -1,7 +1,7 @@
 # This should be database agnostic, but if it isn't, I BLAAAAAAMMMMMMMMMEEEEEEEE ZOIDBERGGGGG
 # Which reminds me, don't use sqlite in prod. It can't do multiple sessions well.
 from flask_sqlalchemy import SQLAlchemy
-
+import pymysql
 db = SQLAlchemy()
 
 class record(db.Model):

@@ -69,3 +69,4 @@ settings.yaml
 .vscode/*
 log-*.csv
 *.log
+*.db
