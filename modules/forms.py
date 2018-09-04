@@ -22,8 +22,8 @@ class signInForm(FlaskForm):
                                                      DataRequired(message="This field is required!")], render_kw={'autofocus': True})
 class general(FlaskForm):
     signIn = BooleanField('Do you want to ask for a sign in after someone scans their badge? This is most useful for hall-pass scenarios.')
-
-
+    generalSubmitButton = SubmitField("Submit")
+    
 class ldap(FlaskForm):
     ldapAvailable = BooleanField('LDAP Enabled', validators=[DataRequired(message="This field is required!")])
     ldapServer = StringField('Active Directory Server: ', description="i.e. ad.celery.net")
@@ -32,10 +32,11 @@ class ldap(FlaskForm):
     ldapAccessPassword = PasswordField('Password for the account.', description="warning: this is stored in plaintext at the moment.")
     ldapSearchBase = StringField('The search base for the name searches.',
                                  description="Usually something like DC=example, DC=com")
+    ldapSubmitButton = SubmitField("Submit")
 class schoology(FlaskForm):
     instanceUrl = StringField('Schoology Instance URL', description="where you log into schoology, i.e. hogwarts.schoology.com")
     apiKey = StringField('Schoology API Key', description="Your API key for Schoology. Available from your Schoology admin or schoology.com/api")
     apiSecret = StringField('Schoology API Secret', description="By the way, the API uses the users credentials, so the keys don't need any permissions.")
-    submitButton = SubmitField("Submit")
+    schoologySubmitButton = SubmitField("Submit")
 
 

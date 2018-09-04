@@ -16,8 +16,8 @@
     <h1>Connect to Schoology</h1>
     {% if schoologyConnectionCheck == False %}
         <div class="container"></div>
-            <p>To access data from Schoology, we need your permission. Click the button to allow access, and then refresh
-            this page!</p>
+            <p>To access data from Schoology, we need your permission. Click the button to allow access, and then come
+                back here!</p>
             <a button type="button" class="btn btn-primary" href="{{ schoologyConnectUrl }}">Connect to Schoology</a>
         </div>
     {% elif schoologyConnectionCheck == True %}

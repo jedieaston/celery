@@ -7,6 +7,7 @@ auth = schoolopy.Auth(settings['apiKey'], settings['apiSecret'], three_legged=Tr
 
 def authUrl(baseUrl):
     # Makes the URL to give to the user to authorize Celery to access Schoology.
+
     try:
         # Creates the URL that redirects back to celery
         url = "https://" + auth.request_authorization()

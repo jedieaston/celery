@@ -15,6 +15,18 @@
 {% block content %}
     <h1>Settings</h1>
         <p>You know, where you change stuff.</p>
+    {% if session['settingsSaved'] == 1 %}
+        <div class="alert alert-success" role="alert">
+            {{ session["settingsLastSaved"] }} settings saved successfully! Restart Celery for the changes to take effect!
+        </div>
+    {% elif session['settingsSaved'] == 2 %}
+        <div class="alert alert-danger" role="alert">
+            We couldn't save your settings changes. Something is wrong. Call your favorite support person.
+        </div>
+    {% elif session['settingsSaved'] == 0 %}
+
+
+    {% endif %}
     <div class="container">
         <h2>General</h2>
         <form action="" method="POST">
@@ -34,9 +46,9 @@
         <h2>Active Directory</h2>
             <p>Settings for configuring access to Active Directory. Contact your administrator to help you with this.</p>
             <form action="" method="POST">
-                <dl>
                     {{ wtf.quick_form(ldapSettings) }}
                 </dl>
+                <dl>
             </form>
     </div>
         <hr width="100%">

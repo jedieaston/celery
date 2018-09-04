@@ -101,14 +101,41 @@ def settingsEditor():
     ldapSet = ldap(**ldapCurrentSettings)
     schoologyCurrentSettings = getSettings(schoologySettings)
     schoologySet = schoologySettings(**schoologyCurrentSettings)
-    if schoologySet.is_submitted():
-        settings.updateSettingsDicts(schoology=schoologySet.data, ldap=ldapSet.data, general=genSet.data)
-        return ("Saved!")
-        # try:
-        #     settings.updateSettingsDicts(schoology=schoologySet.data, ldap=ldap, general=general)
-        #     return("Saved!")
-        # except:
-        #     settingsSaved = False
+
+    # # This works, I don't know why. As a side effect, validation is turned off. Spooky mode engaged.
+    # if schoologySet.is_submitted():
+    #     settings.updateSettingsDicts(schoology=schoologySet.data, ldap=ldapSet.data, general=genSet.data)
+    #     session['lastSaved'] = 1
+    #     # try:
+    #     #     settings.updateSettingsDicts(schoology=schoologySet.data, ldap=ldap, general=general)
+    #     #     return("Saved!")
+    #     # except:
+    #     #     settingsSaved = False
+    if genSet.generalSubmitButton.data and genSet.validate():
+        try:
+            settings.updateSettingsDicts(general = genSet.data)
+            session['settingsLastSaved'] = "General"
+            session['settingsSaved'] = 1
+        except:
+            session['settingsSaved'] = 2
+    elif ldapSet.ldapSubmitButton.data and ldapSet.validate():
+        try:
+            settings.updateSettingsDicts(ldap = ldapSet.data)
+            session['settingsLastSaved'] = "LDAP"
+            session['settingsSaved'] = 1
+        except:
+            session['settingsSaved'] = 2
+    elif schoologySet.schoologySubmitButton.data and schoologySet.validate():
+        try:
+            settings.updateSettingsDicts(schoology = schoologySet.data)
+            session['settingsLastSaved'] = "Schoology"
+            session['settingsSaved'] = 1
+        except:
+            session['settingsSaved'] = 2
+    else:
+        session['settingsSaved'] = 0
     return render_template("settings.html", generalSettings=genSet, ldapSettings=ldapSet, schoologySettings=schoologySet)
+
+
 if __name__ == '__main__':
     app.run()
