@@ -20,12 +20,13 @@ def authUrl(baseUrl):
 
 def connectionCheck():
     # Checks to make sure we have authorization
+
     try:
         check = auth.authorize()
         if check == True:
             global sc
             sc = schoolopy.Schoology(auth)
-            sc.limit = settings["objectLimit"]
+            sc.limit = 5000         # TODO: This needs to be configurable!!!
             return True
         elif check == False:
             return False
