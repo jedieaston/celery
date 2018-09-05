@@ -84,7 +84,8 @@ def signin():
 
 @app.route('/admin/reporting', methods=["GET"])
 def reporting():
-    return render_template("reporting.html")
+
+    return render_template("reporting.html", schoology=schoology, settings=settings)
 
 @app.route('/admin/schoologyconnect', methods=["GET", "POST"])
 def schoologyConnect():

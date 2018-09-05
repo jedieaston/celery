@@ -24,6 +24,7 @@ def connectionCheck():
         check = auth.authorize()
         if check == True:
             global sc
+            sc = schoolopy.Schoology
             sc = schoolopy.Schoology(auth)
             sc.limit = 5000         # TODO: This needs to be configurable!!!
             return True
@@ -31,10 +32,10 @@ def connectionCheck():
             return False
     except:
         return False
-# def devConnect():
-#     # Uses two-leg authentication and the keys we have in settings to connect a REPL to schoology.
-#     global sc
-#     sc = schoolopy.Schoology(schoolopy.Auth(settings['apiKey'], settings['apiSecret']))
+def devConnect():
+    # Uses two-leg authentication and the keys we have in settings to connect a REPL to schoology.
+    sc = schoolopy.Schoology(schoolopy.Auth(settings['apiKey'], settings['apiSecret']))
+    return sc
 def showMe():
     # More of a test, gives information about the user logged in,
     sc.limit = 5
@@ -47,3 +48,14 @@ def schoolGroups():
     for group in sc.get_groups():
         groups[group.id] = group.title
     return groups
+def groupEvents():
+    # Gets you a dictionary of group events and their IDs
+    events = {}
+    for event in sc.get_events(group_id=settings['reportingGroupID']):
+        events[event.id] = event.title
+    return events
+# def getGroupMembersUserNames():
+#     # Gets you a dictionary of users and their usernames
+#     sc.get_group
+
+
