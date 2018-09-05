@@ -1,11 +1,13 @@
 {% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 {% block title %}
     Celery!
 {% endblock %}
 
 {% block styles %}
-{{ super() }}
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    {{ super() }}
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/styles/css/nav.css">
 {% endblock %}
 {% block navbar %}
 {{ nav.celeryNav.render() }}
@@ -15,16 +17,33 @@
 {% block content %}
     <h1>Connect to Schoology</h1>
     {% if schoologyConnectionCheck == False %}
-        <div class="container"></div>
-            <p>To access data from Schoology, we need your permission. Click the button to allow access, and then come
-                back here!</p>
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            To access data from Schoology, we need your permission. Click the button to allow access, and then come
+                back here!
+        </div>
+        <div class="container">
             <a button type="button" class="btn btn-primary" href="{{ schoologyConnectUrl }}">Connect to Schoology</a>
         </div>
     {% elif schoologyConnectionCheck == True %}
         <div class="alert alert-success" role="alert">
-            <i class="fas fa-check"></i>
-            We have your authorization, {{ schoology.sc.get_me().name_first }}. Schoology integration is good to go!
-        </div>
+            {% if alertState == "3"  %}
+                <i class="fas fa-check"></i>
+                We have your authorization, {{ schoology.sc.get_me().name_first }}. Schoology integration is good to go! Reports will be made against {{ schoology.schoolGroups()[reportingGroupID] }}.
+                </div>
+                 <h3>Choose another group for reporting:</h3>
+            {% elif alertState == "2" %}
+                Looks like we're connected. Select a group to continue.
+                </div>
+                 <h3>Choose group for reporting:</h3>
+            {% endif %}
+                <div class="container">
+                    <form action="{{ url_for('schoologyConnect') }}" method="POST">
+                        <dl>
+                            {{ wtf.quick_form(schoologyGroupSelector) }}
+                        </dl>
+                    </form>
+                </div>
     {% endif %}
 {% endblock %}
 

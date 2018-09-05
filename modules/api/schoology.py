@@ -4,7 +4,6 @@ from modules.settings import schoology as settings
 
 #auth = False
 auth = schoolopy.Auth(settings['apiKey'], settings['apiSecret'], three_legged=True, domain=settings['instanceUrl'])
-
 def authUrl(baseUrl):
     # Makes the URL to give to the user to authorize Celery to access Schoology.
 
@@ -32,6 +31,10 @@ def connectionCheck():
             return False
     except:
         return False
+# def devConnect():
+#     # Uses two-leg authentication and the keys we have in settings to connect a REPL to schoology.
+#     global sc
+#     sc = schoolopy.Schoology(schoolopy.Auth(settings['apiKey'], settings['apiSecret']))
 def showMe():
     # More of a test, gives information about the user logged in,
     sc.limit = 5
@@ -42,5 +45,5 @@ def schoolGroups():
     # Gets you a dictionary of school-wide groups and their schoology IDs.
     groups = {}
     for group in sc.get_groups():
-        groups[group.title] = group.id
+        groups[group.id] = group.title
     return groups

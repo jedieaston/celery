@@ -23,13 +23,11 @@ def updateSettingsDicts(**kwargs):
     #print(currentSettingsYaml)
     #writeSettings()
     with open("config/settings.yaml", "w") as settingsYaml:
-        #print(yaml.dump(settings))
         yaml.safe_dump(settings, settingsYaml, default_flow_style=False)
 
 def writeSettings():
     # Write new settings if we need to for some other reason outside of the webui
     with open("config/settings.yaml", "w") as settingsYaml:
-        print(yaml.dump(settings))
         yaml.safe_dump(settings, settingsYaml, default_flow_style=False)
 
 while True:

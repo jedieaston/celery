@@ -1,7 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, PasswordField, SubmitField
+from wtforms import StringField, BooleanField, PasswordField, SubmitField, SelectField
 from wtforms.validators import Length, DataRequired, URL
 from modules import settings
+from modules.api.schoology import schoolGroups
+
+
 def getSettings(form):
     # get settings from settings module and their current values to be injected into a form later.
     currentValues = {}
@@ -39,4 +42,6 @@ class schoology(FlaskForm):
     apiSecret = StringField('Schoology API Secret', description="By the way, the API uses the users credentials, so the keys don't need any permissions.")
     schoologySubmitButton = SubmitField("Submit")
 
-
+class schoologyGroupSelector(FlaskForm):
+    groupList = SelectField('Default Schoology Group') #Choices are created when the form is instantiated.
+    schoologyGroupSelectorSubmit = SubmitField('Submit')
