@@ -19,7 +19,7 @@ def getSettings(form):
     return currentValues
 class signOutForm(FlaskForm):
     idNumber = StringField('ID Number: ', validators=[Length(min=6, max=6, message="That's the wrong length! It should be six characters"),
-                                                     DataRequired(message="This field is required!")], )
+                                                     DataRequired(message="This field is required!")], render_kw={'autofocus': True})
 class signInForm(FlaskForm):
     idNumber = StringField('ID Number: ', validators=[Length(min=6, max=8, message="That's the wrong length! It should be six characters unless you are overriding."),
                                                      DataRequired(message="This field is required!")], render_kw={'autofocus': True})
