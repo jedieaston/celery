@@ -17,6 +17,7 @@ flask-sqlalchemy = "*"
 gunicorn = "*"
 schoolopy = "*"
 pymysql = "*"
+flask-session = "*"
 
 [dev-packages]
 pylint = "*"

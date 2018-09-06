@@ -1,3 +1,4 @@
 from modules.api import schoology
 
-schoology.
+def exportAll():
+    # Exports the records table from the db to the

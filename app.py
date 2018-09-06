@@ -1,5 +1,5 @@
 from modules import settings, recorder
-from flask import Flask, render_template, redirect, url_for, session, request
+from flask import Flask, render_template, redirect, url_for, session, request, Response
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import Navbar, View
@@ -7,12 +7,19 @@ from modules.dbModels import db, record
 from modules.forms import signInForm, signOutForm, general, ldap, getSettings, schoologyGroupSelector
 from modules.forms import schoology as schoologySettings
 import modules.api.schoology as schoology
-
+import pprint
+from flask_session import Session
 app = Flask(__name__)
 # Change this in prod...
 app.config['SECRET_KEY'] = '84328weyrs78sa78asd76f76sdf56asd75632472y8huiasdfh347924h174y43792hg23r4y77y73247bc'
 
 app.config["SQLALCHEMY_DATABASE_URI"] = settings.db["url"]
+
+
+app.config["SESSION_TYPE"] = 'sqlalchemy'
+app.config['SESSION_SQLALCHEMY'] = db
+# Flask Session, for server-side secure-ish session (ooh, alliteration!)
+Session(app)
 
 # Setup flask plugins....
 try:
@@ -24,12 +31,16 @@ except:
     exit()
 
 
+
 Bootstrap(app)
 nav = Nav(app)
 
 
 nav.register_element('celeryNav', Navbar('Celery', View('Sign in', 'home'),
                                          View("Admin Page", 'admin')))
+
+
+#TODO: Move the routes into another file...
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -165,6 +176,10 @@ def settingsEditor():
         session['settingsSaved'] = 0
     return render_template("settings.html", generalSettings=genSet, ldapSettings=ldapSet, schoologySettings=schoologySet)
 
+@app.route('/debug')
+def debug():
+    requestvar = pprint.pformat(request.environ, depth=5)
+    return Response(requestvar, mimetype="text/text")
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True, host="0.0.0.0", port=5000)
