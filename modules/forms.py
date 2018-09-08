@@ -28,7 +28,7 @@ class general(FlaskForm):
     generalSubmitButton = SubmitField("Submit")
     
 class ldap(FlaskForm):
-    ldapAvailable = BooleanField('LDAP Enabled', validators=[DataRequired(message="This field is required!")])
+    ldapAvailable = BooleanField('LDAP Enabled')
     ldapServer = StringField('Active Directory Server: ', description="i.e. ad.celery.net")
     ldapAccessDomain = StringField('Active Directory upn suffix/NETBIOS name', description="i.e. CELERY")
     ldapAccessUserName = StringField('Username for an unprivileged AD account, for name queries.')
