@@ -1,3 +1,4 @@
+[![Build Status](https://dev.azure.com/tendies/Celery/_apis/build/status/jedieaston.celery)](https://dev.azure.com/tendies/Celery/_build/latest?definitionId=3)
 # celery
 A sign in/sign out system, written in Python 3 + Flask
 
