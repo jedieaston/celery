@@ -12,5 +12,5 @@ variables:
 steps:
 - script: |
     docker build -f Dockerfile -t $(imageName) .
-    docker build -f ./nginx/Dockerfile -t $(imageName)-celery .
+    docker build -f ./nginx/Dockerfile -t nginx-celery .
   displayName: 'docker build'
