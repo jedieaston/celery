@@ -1,6 +1,6 @@
 import csv
 from modules import ldapConnect
-from modules.dbModels import record
+from modules.dbModels import records
 import datetime
 import random
 import string
@@ -14,8 +14,8 @@ def signOut(idNumber):
             studentName = "Couldn't find name."
     elif ldapConnect.ldapAvailable == False:
         studentName = "LDAP not available."
-    newRecord = record(studentID=idNumber, studentName=studentName,
-                       timeOut=datetime.datetime.today())
+    newRecord = records(studentID=idNumber, studentName=studentName,
+                        timeOut=datetime.datetime.today())
     return newRecord
 
 def signIn(record, db, override):
@@ -32,8 +32,8 @@ def signInNoOut(idNumber, db):
             studentName = "Couldn't find name."
     elif ldapConnect.ldapAvailable == False:
         studentName = "LDAP not available."
-    newRecord = record(studentID=idNumber, studentName=studentName,
-                       timeOut=datetime.datetime.today(), overridden=False)
+    newRecord = records(studentID=idNumber, studentName=studentName,
+                        timeOut=datetime.datetime.today(), overridden=False)
     db.session.add(newRecord)
     db.session.commit()
     return studentName

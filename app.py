@@ -3,7 +3,7 @@ from flask import Flask, render_template, redirect, url_for, session, request, R
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import Navbar, View
-from modules.dbModels import db, record
+from modules.dbModels import db, records
 from modules.forms import signInForm, signOutForm, general, ldap, getSettings, schoologyGroupSelector
 from modules.forms import schoology as schoologySettings
 import modules.api.schoology as schoology

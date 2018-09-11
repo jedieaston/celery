@@ -63,6 +63,7 @@ fabric.properties
 .idea/httpRequests
 
 __pycache__/*
+modules/__pycache__/*
 notebooks/*
 settings.yaml
 .ipynb_checkpoints/*
@@ -70,3 +71,6 @@ settings.yaml
 log-*.csv
 *.log
 *.db
+reports-*.csv
+docker-compose.yml
+export*

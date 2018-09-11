@@ -19,7 +19,7 @@ def signOut(idNumber):
     record = {}
     record["idNumber"] = idNumber
     record["Name"] = ldapConnect.getStudentName(idNumber)
-    #record["Name"] = "Mr. Placeholder!"
+    #records["Name"] = "Mr. Placeholder!"
     timeNow = datetime.datetime.now()
     record["Time Out"] = timeNow.strftime("%m-%d-%Y %H:%M")
     return record
@@ -35,7 +35,7 @@ def signInNoOut(idNumber):
     record = {}
     record["idNumber"] = idNumber
     record["Name"] = ldapConnect.getStudentName(idNumber)
-    #record["Name"] = "Mr. Placeholder!"
+    #records["Name"] = "Mr. Placeholder!"
     timeNow = datetime.datetime.now()
     record["Signed in at"] = timeNow.strftime("%m-%d-%Y %H:%M")
     recordsForExport.append(record)

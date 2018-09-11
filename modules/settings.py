@@ -5,7 +5,7 @@ defaultSettings = {'db': {'url': 'postgres+psycopg2://postgres:celery@db:5432/ce
   'ldapAccessPassword': 'Passw0rd!',
   'ldapAccessUserName': 'Unprivileged',
   'ldapAuthenticationStandard': 'NTLM',
-  'ldapAvailable': True,
+  'ldapAvailable': False,
   'ldapSearchBase': 'DC=example, DC=com',
   'ldapServer': 'ad.celery.internal'},
  'schoology': {'apiKey': 'buymeatendiesub',
@@ -30,6 +30,26 @@ def writeSettings():
     with open("config/settings.yaml", "w") as settingsYaml:
         yaml.safe_dump(settings, settingsYaml, default_flow_style=False)
 
+# while True:
+#     try:
+#         with open("config/settings.yaml", "r+") as settingsFile:
+#             settings = yaml.safe_load(settingsFile)
+#             if settings == None:
+#                 raise Exception("Woah, there's nothing in the settings file. Restoring defaults.")
+#         break
+#     except:
+#         try:
+#             # If settings don't exist, create new settings file.
+#             with open('config/settings.yaml', 'a+') as newSettings:
+#                 yaml.safe_dump(defaultSettings, newSettings, default_flow_style=False)
+#             with open("config/settings.yaml") as settings:
+#                 settings = yaml.safe_load(settings)
+#             break
+#         except:
+#             print("We're having issues interacting with your file system, meaning we can't create a settings file. Exiting.")
+#             exit()
+#         continue
+
 while True:
     try:
         with open("config/settings.yaml", "r+") as settingsFile:
@@ -39,17 +59,15 @@ while True:
         break
     except:
         try:
-            # If settings don't exist, create new settings file.
+        # If settings don't exist, create new settings file.
             with open('config/settings.yaml', 'a+') as newSettings:
                 yaml.safe_dump(defaultSettings, newSettings, default_flow_style=False)
             with open("config/settings.yaml") as settings:
                 settings = yaml.safe_load(settings)
-            break
         except:
-            print("We're having issues interacting with your file system, meaning we can't create a settings file. Exiting.")
+            print("We're having issues interacting with your filesystem, and cannot "
+                  "save a configuration file. Exiting.")
             exit()
-        continue
-
 # with open("config/settings.yaml", "r") as settings:
 #     settings = yaml.load(settings)
 ldap = settings["ldap"]
