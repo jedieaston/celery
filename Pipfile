@@ -18,6 +18,8 @@ gunicorn = "*"
 schoolopy = "*"
 pymysql = "*"
 flask-session = "*"
+pytz = "*"
+tzlocal = "*"
 
 [dev-packages]
 pylint = "*"

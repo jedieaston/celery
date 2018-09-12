@@ -1,4 +1,4 @@
-from modules import settings, recorder
+from modules import settings, recorder, reports
 from flask import Flask, render_template, redirect, url_for, session, request, Response
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
@@ -95,8 +95,7 @@ def signin():
 
 @app.route('/admin/reporting', methods=["GET"])
 def reporting():
-
-    return render_template("reporting.html", schoology=schoology, settings=settings)
+    return render_template("reporting.html", schoology=schoology, settings=settings, reports=reports)
 
 @app.route('/admin/schoologyconnect', methods=["GET", "POST"])
 def schoologyConnect():
