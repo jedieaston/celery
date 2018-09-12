@@ -72,7 +72,7 @@ def home():
 
 @app.route('/admin')
 def admin():
-    return render_template("admin.html")
+    return render_template("admin/admin.html")
 
 @app.route('/signin', methods=["GET", "POST"])
 def signin():
@@ -111,7 +111,7 @@ def schoologyConnect():
             settings.schoology["reportingGroupID"] = schoologyDefaultGroupForm.groupList.data
             settings.writeSettings()
             #alertState 3 means we are ready to go on reporting!
-            return render_template("schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+            return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
                                    schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
                                    schoologyGroupSelector=schoologyDefaultGroupForm, alertState="3",
                                    reportingGroupID=settings.schoology["reportingGroupID"])
@@ -119,18 +119,18 @@ def schoologyConnect():
             # IF we already have a group ID saved in settings, we'll use that.
             schoologyDefaultGroupForm.groupList.default = settings.schoology["reportingGroupID"]
             # alertState 3 means we are ready to go on reporting!
-            return render_template("schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+            return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
                                    schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
                                    schoologyGroupSelector=schoologyDefaultGroupForm, alertState="3",
                                    reportingGroupID=settings.schoology["reportingGroupID"])
         else:
             # alertState 2 means we're authorized, but you need to select a group from your school to continue.
-            return render_template("schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+            return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
                                    schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
                                    schoologyGroupSelector=schoologyDefaultGroupForm, alertState="2")
     else:
         # We need authorization. Let's get it!
-        return render_template("schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+        return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
                                schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology)
 
 @app.route('/admin/settings', methods=["GET", "POST"])
@@ -174,7 +174,7 @@ def settingsEditor():
             session['settingsSaved'] = 2
     else:
         session['settingsSaved'] = 0
-    return render_template("settings.html", generalSettings=genSet, ldapSettings=ldapSet, schoologySettings=schoologySet)
+    return render_template("admin/settings.html", generalSettings=genSet, ldapSettings=ldapSet, schoologySettings=schoologySet)
 
 @app.route('/debug')
 def debug():
