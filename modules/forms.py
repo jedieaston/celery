@@ -2,7 +2,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, PasswordField, SubmitField, SelectField
 from wtforms.validators import Length, DataRequired, URL
 from modules import settings
-from modules.api.schoology import schoolGroups
 
 
 def getSettings(form):
@@ -18,7 +17,9 @@ def getSettings(form):
     #print(currentValues)
     return currentValues
 class signOutForm(FlaskForm):
-    idNumber = StringField('ID Number: ', validators=[Length(min=6, max=6, message="That's the wrong length! It should be six characters"),
+    # TODO: Validators for the ID Number need to be user-configurable.
+    idNumber = StringField('ID Number: ', validators=[Length(min=6, max=6, message="That's the wrong length! It "
+                                                                                   "should be six characters."),
                                                      DataRequired(message="This field is required!")], render_kw={'autofocus': True})
 class signInForm(FlaskForm):
     idNumber = StringField('ID Number: ', validators=[Length(min=6, max=8, message="That's the wrong length! It should be six characters unless you are overriding."),
@@ -26,7 +27,8 @@ class signInForm(FlaskForm):
 class general(FlaskForm):
     signIn = BooleanField('Do you want to ask for a sign in after someone scans their badge? This is most useful for hall-pass scenarios.')
     generalSubmitButton = SubmitField("Submit")
-    
+
+# TODO: Why is the CSRF Token missing under Chrome on the settings page? Gotta figure this one out.
 class ldap(FlaskForm):
     ldapAvailable = BooleanField('LDAP Enabled')
     ldapServer = StringField('Active Directory Server: ', description="i.e. ad.celery.net")

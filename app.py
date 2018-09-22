@@ -3,11 +3,10 @@ from flask import Flask, render_template, redirect, url_for, session, request, R
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import Navbar, View
-from modules.dbModels import db, records
+from modules.dbModels import db
 from modules.forms import signInForm, signOutForm, general, ldap, getSettings, schoologyGroupSelector
 from modules.forms import schoology as schoologySettings
 import modules.api.schoology as schoology
-import pprint
 from flask_session import Session
 app = Flask(__name__)
 # Change this in prod...
@@ -15,10 +14,10 @@ app.config['SECRET_KEY'] = '84328weyrs78sa78asd76f76sdf56asd75632472y8huiasdfh34
 
 app.config["SQLALCHEMY_DATABASE_URI"] = settings.db["url"]
 
-
+# Flask Session, for server-side sessions. (ooh, alliteration!)
 app.config["SESSION_TYPE"] = 'sqlalchemy'
 app.config['SESSION_SQLALCHEMY'] = db
-# Flask Session, for server-side secure-ish session (ooh, alliteration!)
+
 Session(app)
 
 # Setup flask plugins....
@@ -29,46 +28,48 @@ try:
 except:
     print("Can't connect to the database! Check to make sure your settings are correct.")
     exit()
-
-
-
+# Flask Bootstrap and Flask Nav.
 Bootstrap(app)
 nav = Nav(app)
-
 
 nav.register_element('celeryNav', Navbar('Celery', View('Sign in', 'home'),
                                          View("Admin Page", 'admin')))
 
 
-#TODO: Move the routes into another file...
+#TODO: Move the routes into another file, to make life easier.
 
 
 @app.route('/', methods=["GET", "POST"])
 
 def home():
     try:
+        #Are we coming here from another page?
         alertState = session.get("alertState", None)
     except:
+        # Guess we are not.
         alertState == "0"
-
     if alertState == "0":
         pass
     form = signOutForm()
     if form.validate_on_submit():
-        session["lastCheckedUser"] = form.idNumber.data
+        lastCheckedUser = form.idNumber.data
+        # If this is a hall-pass type scenario, we need to have them sign back in.
         if settings.general["signIn"] == True:
             global record
             record = recorder.signOut(form.idNumber.data)
             return redirect(url_for('signin'))
         else:
             try:
-                session["lastCheckedUser"] = recorder.signInNoOut(form.idNumber.data, db)
+                lastCheckedUser = recorder.signInNoOut(form.idNumber.data, db)
                 alertState = "1"
+                # Clears out the form since it was successful.
+                form.idNumber.data = ""
             except:
-                alertState = "2"
+                alertState = "2" #TODO: Make it more clear here what this means.
     else:
         alertState == "0"
-    return render_template("index.html", form=form, alertState=alertState)
+        lastCheckedUser= None
+    return render_template("index.html", form=form, alertState=alertState, lastCheckedUser=lastCheckedUser)
 
 @app.route('/admin')
 def admin():
@@ -82,7 +83,7 @@ def signin():
         if form.idNumber.data == "override":
             override = True
             recorder.signIn(record, db, override)
-            session["alertState"] = "4"
+            session["alertState"] = "4" #TODO: Clarify this in a comment, so future Easton can remember what this means.
             return redirect(url_for('home'))
         elif form.idNumber.data == record.studentID:
             override = False
@@ -109,6 +110,8 @@ def schoologyConnect():
         if schoologyDefaultGroupForm.validate_on_submit():
             settings.schoology["reportingGroupID"] = schoologyDefaultGroupForm.groupList.data
             settings.writeSettings()
+            # Lets put the members into the database to make reporting easier....
+            schoology.importGroupEnrollmentsToDatabase(settings.schoology["reportingGroupID"], db)
             #alertState 3 means we are ready to go on reporting!
             return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
                                    schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
@@ -117,6 +120,8 @@ def schoologyConnect():
         elif "reportingGroupID" in settings.schoology:
             # IF we already have a group ID saved in settings, we'll use that.
             schoologyDefaultGroupForm.groupList.default = settings.schoology["reportingGroupID"]
+            # Lets put the members into the database to make reporting easier....
+            schoology.importGroupEnrollmentsToDatabase(settings.schoology["reportingGroupID"], db)
             # alertState 3 means we are ready to go on reporting!
             return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
                                    schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
@@ -141,44 +146,42 @@ def settingsEditor():
     schoologyCurrentSettings = getSettings(schoologySettings)
     schoologySet = schoologySettings(**schoologyCurrentSettings)
 
-    # # This works, I don't know why. As a side effect, validation is turned off. Spooky mode engaged.
-    # if schoologySet.is_submitted():
-    #     settings.updateSettingsDicts(schoology=schoologySet.data, ldap=ldapSet.data, general=genSet.data)
-    #     session['lastSaved'] = 1
-    #     # try:
-    #     #     settings.updateSettingsDicts(schoology=schoologySet.data, ldap=ldap, general=general)
-    #     #     return("Saved!")
-    #     # except:
-    #     #     settingsSaved = False
+    # TODO: Find a better way to do this. Maybe it's just to make one form. I don't know.
     if genSet.generalSubmitButton.data and genSet.validate():
         try:
             settings.updateSettingsDicts(general = genSet.data)
-            session['settingsLastSaved'] = "General"
-            session['settingsSaved'] = 1
+            settingsLastSaved = "General"
+            settingsSaved = True
         except:
-            session['settingsSaved'] = 2
+            settingsSaved = False
     elif ldapSet.ldapSubmitButton.data and ldapSet.validate():
         try:
             settings.updateSettingsDicts(ldap = ldapSet.data)
-            session['settingsLastSaved'] = "LDAP"
-            session['settingsSaved'] = 1
+            settingsLastSaved = "LDAP"
+            settingsSaved = True
         except:
-            session['settingsSaved'] = 2
+            settingsSaved = False
     elif schoologySet.schoologySubmitButton.data and schoologySet.validate():
         try:
             settings.updateSettingsDicts(schoology = schoologySet.data)
-            session['settingsLastSaved'] = "Schoology"
-            session['settingsSaved'] = 1
+            settingsLastSaved = "Schoology"
+            settingsSaved = True
         except:
-            session['settingsSaved'] = 2
+            settingsSaved = False
     else:
-        session['settingsSaved'] = 0
-    return render_template("admin/settings.html", generalSettings=genSet, ldapSettings=ldapSet, schoologySettings=schoologySet)
+        # They didn't submit anything.
+        settingsSaved = None
+        settingsLastSaved = None
+    return render_template("admin/settings.html", generalSettings=genSet, ldapSettings=ldapSet,
+                           schoologySettings=schoologySet, settingsSaved=settingsSaved,
+                           settingsLastSaved=settingsLastSaved)
 
-@app.route('/debug')
-def debug():
-    requestvar = pprint.pformat(request.environ, depth=5)
-    return Response(requestvar, mimetype="text/text")
+if settings.dev["debug"] == True:
+    import pprint
+    @app.route('/debug')
+    def debug():
+        requestvar = pprint.pformat(request.environ, depth=5)
+        return Response(requestvar, mimetype="text/text")
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5000)

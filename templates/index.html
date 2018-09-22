@@ -20,7 +20,7 @@
 
         {% elif alertState == "1" %}
             <div class="alert alert-success" role="alert">
-                Sign-in for {{ session["lastCheckedUser"] }} was successful!
+                Sign-in for {{ lastCheckedUser }} was successful!
             </div>
         {% elif alertState == "2" %}
             <div class="alert alert-danger" role="alert">

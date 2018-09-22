@@ -16,4 +16,5 @@ schoology:
   apiKey: "buymeatendiesub"
   apiSecret: "skdfjlasfaslaksdlaslasfasflkasdkf3e4rijowejrf"
   requestLimit: "5000"
-
+dev:
+  debug: true

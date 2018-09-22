@@ -1,7 +1,9 @@
 # Requires Schoolopy. Could I had used requests? yes, but this guy already did it.
 import schoolopy
 from modules.settings import schoology as settings
+from modules.dbModels import importedUsers
 from flask import session
+from sqlalchemy import exc
 #auth = False
 auth = schoolopy.Auth(settings['apiKey'], settings['apiSecret'], three_legged=True, domain=settings['instanceUrl'])
 def authUrl(baseUrl):
@@ -25,23 +27,26 @@ def connectionCheck(userAccessToken=None, userAccessTokenSecret=None):
         if userAccessToken == None and userAccessTokenSecret == None:
             check = auth.authorize()
             if check == True:
+                # They are logged into Schoology, so their token will be saved to their session to make sure we keep
+                # track of it.
                 session['schoologyUserAccessToken'] = auth.access_token
                 session['schoologyUserAccessTokenSecret'] = auth.request_token_secret
                 sc = schoolopy.Schoology
                 sc = schoolopy.Schoology(auth)
-                sc.limit = 5000         # TODO: This needs to be configurable!!!
+                sc.limit = 5000         # TODO: This needs to be configurable!
                 return True
             elif check == False:
-                    # Recursion intensifies.....
+                    # Do we have keys?
                     try:
                         if 'schoologyUserAccessToken' in session:
+                            # Ahhhh, recursion!
                             tryCookies = connectionCheck(userAccessToken=session.get('schoologyUserAccessToken'),
                                             userAccessTokenSecret=session.get('schoologyUserAccessTokenSecret'))
                             return tryCookies
                         else:
                             return False # No keys anywhere...
                     except:
-                        return False # Can't find keys yo.
+                        return False # Can't find those keys.
         else:
             # Now we'll try what's in the cookie.
             auth.access_token_secret = userAccessTokenSecret
@@ -78,8 +83,22 @@ def groupEvents():
     for event in sc.get_events(group_id=settings['reportingGroupID']):
         events[event.id] = event.title
     return events
-# def getGroupMembersUserNames():
-#     # Gets you a dictionary of users and their usernames
-#     sc.get_group
+def importGroupEnrollmentsToDatabase(group_id, db):
+    # adds the user identifiers and names to the database for use with reporting
+    members = sc.get_group_enrollments(group_id=group_id)
+    for member in members:
+        school_uid = member.school_uid.split("_")
+        if school_uid[0] == "1": # TODO : This is SJCSD specific code that needs to be made into a setting.
+            studentID = "s" + school_uid[len(school_uid) - 1] # This gets around some weird quirk in the Schoology API.
+        else:
+            # They must be a teacher or something.
+            continue
+        recordExists = importedUsers.query.filter_by(studentID=studentID).first()
+        if recordExists:
+            print("Record already exists for", member.name_display, "skipping.")
+        else:
+            record = importedUsers(studentID=studentID, studentName=member.name_display)
+            db.session.add(record)
+            db.session.commit()
 
 

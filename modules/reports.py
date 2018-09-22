@@ -7,22 +7,23 @@ import string
 import pytz
 import tzlocal
 import time
-import os, shutil
+import os
 
 # Get the timezone!!1!
 
 localTz = tzlocal.get_localzone()
+
+
 def exportAll():
     # Exports the records table from the db to a csv in static, then spits out the link.
-    filePath = 'static/reports/exportAll-' + ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(9)) + ".csv"
+    filePath = 'static/reports/exportAll-' + ''.join(
+        random.choice(string.ascii_lowercase + string.digits) for _ in range(9)) + ".csv"
     dbQuery = records.query.all()
     with open(filePath, 'w') as csvFile:
-        outcsv = csv.writer(csvFile, delimiter=',',quotechar='"', quoting = csv.QUOTE_MINIMAL)
+        outcsv = csv.writer(csvFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         header = records.__table__.columns.keys()
         outcsv.writerow(header)
         for record in dbQuery:
-            # print(record.data)
-            # outcsv.writerow([getattr(record, c) for c in header])
             row = []
             for c in header:
                 if c == "timeOut" or c == "timeIn":
@@ -39,6 +40,7 @@ def exportAll():
             outcsv.writerow(row)
     return filePath
 
+
 def clearFolder():
     # Thanks, https://stackoverflow.com/a/185941 !
     folder = "static/reports/"
@@ -50,5 +52,7 @@ def clearFolder():
         except:
             print("Uhh, we couldn't clear the reports folder. Something may be up with the filesystem...")
 
-# Runs on import to make sure we keep the folder tidy, since everything is just queries against the db anyway.
+
+# Runs on import to make sure we keep the folder tidy, since the reports can be regenerated as long as the database is
+# intact.
 clearFolder()

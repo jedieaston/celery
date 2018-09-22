@@ -12,10 +12,10 @@ def ldapSetUp():
                                         authentication=settings.ldap["ldapAuthenticationStandard"])
             return True, ldapConnection
         except:
-            print("Can't connect to your LDAP server! Check your configuration.")
+            print("Can't connect to your Active Directory domain! Check your configuration.")
             return False, None
     else:
-        print("LDAP Disabled! Names will not be available from Active Directory.")
+        # According to settings.yaml, they didn't want AD anyway.
         return False, None
 def getStudentName(id):
     searchName = "s" + str(id)  # adds s so you can search AD by student number...

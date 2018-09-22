@@ -1,20 +1,29 @@
 import csv
 from modules import ldapConnect
-from modules.dbModels import records
+from modules.dbModels import records, importedUsers
 import datetime
-import random
-import string
+from modules.api.schoology import connectionCheck # To see if we can get names from schoology.
+
 
 
 def signOut(idNumber):
-    if ldapConnect.ldapAvailable == True:
+    if connectionCheck() == True:
+        # Cool, schoology is connected, meaning we have should have names in the database.
+        # Also, TODO: Do we need to worry about storing student names in the database? Probably.
+        try:
+            studentIDQuery = importedUsers.query.filter_by(studentID="s" + str(idNumber))
+            studentName = studentIDQuery[0].studentName
+        except:
+            # They must not be in the group.
+            studentName = "Unknown"
+    elif ldapConnect.ldapAvailable == True:
         try:
             studentName = ldapConnect.getStudentName(idNumber)
         except:
-            studentName = "Couldn't find name."
-    elif ldapConnect.ldapAvailable == False:
-        studentName = "LDAP not available."
-    newRecord = records(studentID=idNumber, studentName=studentName,
+            studentName = "Unknown"
+    else:
+        studentName = "Unknown"
+    newRecord = records(studentID="s" + idNumber, studentName=studentName,
                         timeOut=datetime.datetime.today())
     return newRecord
 
@@ -24,6 +33,7 @@ def signIn(record, db, override):
     db.session.add(record)
     db.session.commit()
 
+# If we aren't signing back in (i.e for a club meeting or something)
 def signInNoOut(idNumber, db):
     if ldapConnect.ldapAvailable == True:
         try:
