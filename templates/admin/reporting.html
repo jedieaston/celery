@@ -33,7 +33,7 @@
     <p>This dumps the entire records table from the database into a csv file for manual data
     analysis. It may take a little while depending on how long Celery has been running. Perfect for
     backup purposes.</p>
-    <a href="{{ request.url_root + reports.exportAll() }}" type="button" class="btn btn-primary">Download Report!</a>
+    {{ wtf.quick_form(getAllReports) }}
 </div>
 <hr width="100%">
 {% endblock %}

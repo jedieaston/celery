@@ -1,5 +1,5 @@
 from modules.api import schoology
-from modules.dbModels import db, records
+from modules.dbModels import db, records, importedUsers
 import datetime
 import random
 import csv
@@ -40,6 +40,30 @@ def exportAll():
             outcsv.writerow(row)
     return filePath
 
+def attendedEvent(eventDate):
+    # Returns a CSV of whether people were there or not on a certain date.
+    # TODO: Make this also be able to use start/end times so it is more accurate.
+    date = datetime.datetime.strptime(eventDate, '%Y-%m-%d').date()
+    result = []
+    for user in importedUsers.query.all():
+        print(user.studentID)
+        recordQuery = records.query.filter_by(studentID=user.studentID)
+        print(recordQuery.count())
+        for result in recordQuery:
+            print(result.timeOut.date())
+            if result.timeOut.date() == date:
+                queryResult = {"studentID": result.studentID, "studentName": result.studentName, "studentAttended": True}
+                break
+            else:
+                continue
+        if queryResult["studentID"] != user.studentID:
+            # variable wasn't overwritten, therefore they were not there on that date.
+            queryResult = {"studentID": user.studentID, "studentName": user.studentName, "studentAttended": False}
+            result.append(queryResult)
+        else:
+            # they were there because it was overwritten.
+            result.append(queryResult)
+    return result
 
 def clearFolder():
     # Thanks, https://stackoverflow.com/a/185941 !

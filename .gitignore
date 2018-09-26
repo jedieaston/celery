@@ -74,3 +74,4 @@ log-*.csv
 reports-*.csv
 docker-compose.yml
 export*
+*.ipynb

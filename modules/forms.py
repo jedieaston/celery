@@ -47,3 +47,5 @@ class schoology(FlaskForm):
 class schoologyGroupSelector(FlaskForm):
     groupList = SelectField('Default Schoology Group') #Choices are created when the form is instantiated.
     schoologyGroupSelectorSubmit = SubmitField('Submit')
+class getAllReports(FlaskForm):
+    getAllReportsSubmit = SubmitField('Submit')

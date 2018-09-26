@@ -3,8 +3,8 @@ from flask import Flask, render_template, redirect, url_for, session, request, R
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import Navbar, View
-from modules.dbModels import db
-from modules.forms import signInForm, signOutForm, general, ldap, getSettings, schoologyGroupSelector
+from modules.dbModels import db, importedUsers
+from modules.forms import signInForm, signOutForm, general, ldap, getSettings, schoologyGroupSelector, getAllReports
 from modules.forms import schoology as schoologySettings
 import modules.api.schoology as schoology
 from flask_session import Session
@@ -12,7 +12,9 @@ app = Flask(__name__)
 # Change this in prod...
 app.config['SECRET_KEY'] = '84328weyrs78sa78asd76f76sdf56asd75632472y8huiasdfh347924h174y43792hg23r4y77y73247bc'
 
+# Flask-SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = settings.db["url"]
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False # Disables Flask-SQLAlchemy's event system.
 
 # Flask Session, for server-side sessions. (ooh, alliteration!)
 app.config["SESSION_TYPE"] = 'sqlalchemy'
@@ -96,7 +98,8 @@ def signin():
 
 @app.route('/admin/reporting', methods=["GET"])
 def reporting():
-    return render_template("reporting.html", schoology=schoology, settings=settings, reports=reports)
+    return render_template("admin/reporting.html", schoology=schoology, settings=settings, reports=reports,
+                           getAllReports=getAllReports)
 
 @app.route('/admin/schoologyconnect', methods=["GET", "POST"])
 def schoologyConnect():
@@ -107,31 +110,50 @@ def schoologyConnect():
     if schoologyConnectionCheck == True:
         # Sets up the group selector once we know Schoology is connected properly.
         schoologyDefaultGroupForm.groupList.choices = schoology.schoolGroups().items()
-        if schoologyDefaultGroupForm.validate_on_submit():
-            settings.schoology["reportingGroupID"] = schoologyDefaultGroupForm.groupList.data
-            settings.writeSettings()
-            # Lets put the members into the database to make reporting easier....
-            schoology.importGroupEnrollmentsToDatabase(settings.schoology["reportingGroupID"], db)
-            #alertState 3 means we are ready to go on reporting!
-            return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
-                                   schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
-                                   schoologyGroupSelector=schoologyDefaultGroupForm, alertState="3",
-                                   reportingGroupID=settings.schoology["reportingGroupID"])
-        elif "reportingGroupID" in settings.schoology:
-            # IF we already have a group ID saved in settings, we'll use that.
-            schoologyDefaultGroupForm.groupList.default = settings.schoology["reportingGroupID"]
-            # Lets put the members into the database to make reporting easier....
-            schoology.importGroupEnrollmentsToDatabase(settings.schoology["reportingGroupID"], db)
-            # alertState 3 means we are ready to go on reporting!
-            return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
-                                   schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
-                                   schoologyGroupSelector=schoologyDefaultGroupForm, alertState="3",
-                                   reportingGroupID=settings.schoology["reportingGroupID"])
-        else:
-            # alertState 2 means we're authorized, but you need to select a group from your school to continue.
-            return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
-                                   schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
-                                   schoologyGroupSelector=schoologyDefaultGroupForm, alertState="2")
+        while True:
+            if schoologyDefaultGroupForm.validate_on_submit():
+                settings.schoology["reportingGroupID"] = schoologyDefaultGroupForm.groupList.data
+                settings.writeSettings()
+                # Drop the importedUsers table because we changed groups.
+                importedUsers.query.delete()
+                db.session.commit()
+                # It is recreated when the next group is imported.
+                try:
+                    schoology.importGroupEnrollmentsToDatabase(settings.schoology["reportingGroupID"], db)
+                except KeyError:
+                    # The user doesn't have the required amount of access to the Schoology group they selected.
+                    alertState = "5"
+                    return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+                                           schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
+                                           schoologyGroupSelector=schoologyDefaultGroupForm, alertState=alertState,
+                                           reportingGroupID=settings.schoology["reportingGroupID"])
+                return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+                                       schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
+                                       schoologyGroupSelector=schoologyDefaultGroupForm, alertState="3",
+                                       reportingGroupID=settings.schoology["reportingGroupID"])
+            elif "reportingGroupID" in settings.schoology:
+                # IF we already have a group ID saved in settings, we'll use that.
+                schoologyDefaultGroupForm.groupList.default = settings.schoology["reportingGroupID"]
+                # Lets put the members into the database to make reporting easier....
+                try:
+                    schoology.importGroupEnrollmentsToDatabase(settings.schoology["reportingGroupID"], db)
+                except KeyError:
+                    # The user doesn't have the required amount of access to the Schoology group they selected.
+                    alertState = "5"
+                    return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+                                           schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
+                                           schoologyGroupSelector=schoologyDefaultGroupForm, alertState=alertState,
+                                           reportingGroupID=settings.schoology["reportingGroupID"])
+                # alertState 3 means we are ready to go on reporting!
+                return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+                                       schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
+                                       schoologyGroupSelector=schoologyDefaultGroupForm, alertState="3",
+                                       reportingGroupID=settings.schoology["reportingGroupID"])
+            else:
+                # alertState 2 means we're authorized, but you need to select a group from your school to continue.
+                return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
+                                       schoologyConnectionCheck=schoologyConnectionCheck, schoology=schoology,
+                                       schoologyGroupSelector=schoologyDefaultGroupForm, alertState="2")
     else:
         # We need authorization. Let's get it!
         return render_template("admin/schoologySetup.html", schoologyConnectUrl=schoologyConnectUrl,
