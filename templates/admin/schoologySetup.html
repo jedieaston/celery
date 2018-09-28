@@ -19,8 +19,8 @@
     {% if schoologyConnectionCheck == False %}
         <div class="alert alert-warning" role="alert">
             <i class="fas fa-exclamation-triangle"></i>
-            To access data from Schoology, we need your permission. Click the button to allow access, and then come
-                back here!
+            To access data from Schoology, including group members and events, we need your permission. Click the button
+            to allow access.
         </div>
         <div class="col-md-4 text-center">
             <a button type="button" class="btn btn-primary" href="{{ schoologyConnectUrl }}">Connect to Schoology</a>
@@ -28,7 +28,10 @@
     {% elif schoologyConnectionCheck == True %}
         {% if alertState == "3"  %}
             <div class="alert alert-success" role="alert">
-                <i class="fas fa-thumbs-up"></i>We have your authorization, {{ schoology.sc.get_me().name_first }}. Schoology integration is good to go! Reports will be made against {{ schoology.schoolGroups()[reportingGroupID] }}.
+                <i class="fas fa-thumbs-up"></i>  We have your authorization, {{ schoology.sc.get_me().name_first }}.
+                Schoology integration is good to go! Reports and name identification will be against {{ schoology
+                .schoolGroups()
+                [reportingGroupID] }}.
             </div>
             <h3>Choose another group for reporting:</h3>
         {% elif alertState == "2" %}

@@ -4,7 +4,8 @@ from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import Navbar, View
 from modules.dbModels import db, importedUsers
-from modules.forms import signInForm, signOutForm, general, ldap, getSettings, schoologyGroupSelector, getAllReports
+from modules.forms import signInForm, signOutForm, general, ldap, getSettings, schoologyGroupSelector, getAllReports,\
+    attendedEventSelector
 from modules.forms import schoology as schoologySettings
 import modules.api.schoology as schoology
 from flask_session import Session
@@ -85,7 +86,8 @@ def signin():
         if form.idNumber.data == "override":
             override = True
             recorder.signIn(record, db, override)
-            session["alertState"] = "4" #TODO: Clarify this in a comment, so future Easton can remember what this means.
+            session["alertState"] = "4" #TODO: Clarify this in a comment, so future Easton can remember what this error
+            # means.
             return redirect(url_for('home'))
         elif form.idNumber.data == record.studentID:
             override = False
@@ -96,19 +98,38 @@ def signin():
             alertState = "2"
     return render_template("signin.html", form=form, record=record, alertState=alertState)
 
-@app.route('/admin/reporting', methods=["GET"])
+@app.route('/admin/reporting', methods=["GET", "POST"])
 def reporting():
+    attendedEventSelectorForm = attendedEventSelector()
+    if schoology.connectionCheck() == True:
+        try:
+            listOfEvents = schoology.groupEvents().items()
+            alertState = "0"
+            attendedEventSelectorForm.eventList.choices = listOfEvents
+        except:
+            # No events in Schoology group...
+            alertState = "2"
+
+    if attendedEventSelectorForm.validate_on_submit():
+        reportLink = reports.attendedEvent(attendedEventSelectorForm.eventList.data)
+        return render_template("admin/reporting.html", schoology=schoology, settings=settings, reports=reports,
+                               getAllReports=getAllReports, attendedEventSelectorForm=attendedEventSelectorForm,
+                               alertState="1"
+                               ,reportLink=reportLink)
     return render_template("admin/reporting.html", schoology=schoology, settings=settings, reports=reports,
-                           getAllReports=getAllReports)
+                           getAllReports=getAllReports, attendedEventSelectorForm=attendedEventSelectorForm,
+                           alertState="0",
+                           reportLink=None)
+
 
 @app.route('/admin/schoologyconnect', methods=["GET", "POST"])
 def schoologyConnect():
     urlForCelery = request.base_url
     schoologyConnectionCheck = schoology.connectionCheck()
     schoologyConnectUrl = schoology.authUrl(urlForCelery)
-    schoologyDefaultGroupForm = schoologyGroupSelector()
     if schoologyConnectionCheck == True:
         # Sets up the group selector once we know Schoology is connected properly.
+        schoologyDefaultGroupForm = schoologyGroupSelector()
         schoologyDefaultGroupForm.groupList.choices = schoology.schoolGroups().items()
         while True:
             if schoologyDefaultGroupForm.validate_on_submit():

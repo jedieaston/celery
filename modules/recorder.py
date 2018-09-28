@@ -43,7 +43,13 @@ def signInNoOut(idNumber, db):
             studentName = studentIDQuery[0].studentName
         except:
             # They must not be in the group.
-            studentName = "Unknown"
+            if ldapConnect.ldapAvailable == True:
+                try:
+                    studentName = ldapConnect.getStudentName(idNumber)
+                except:
+                    studentName = "Unknown"
+            else:
+                studentName = "Unknown"
     elif ldapConnect.ldapAvailable == True:
         try:
             studentName = ldapConnect.getStudentName(idNumber)

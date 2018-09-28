@@ -20,7 +20,6 @@ pymysql = "*"
 flask-session = "*"
 pytz = "*"
 tzlocal = "*"
-ipykernel = "*"
 
 [dev-packages]
 pylint = "*"

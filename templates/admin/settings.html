@@ -39,17 +39,17 @@
     <hr width="100%">
     <div class="container">
         <h2>Database</h2>
-            <p>Database settings can be changed from the config/settings.yaml file. They break the web interface,
-                so we don't put them here.</p>
+            <p>Database settings can be changed from the config/settings.yaml file. Editing from the web interface is
+                coming soon.</p>
     </div>
        <hr width="100%">
     <div class="container">
         <h2>Active Directory</h2>
             <p>Settings for configuring access to Active Directory. Contact your administrator to help you with this.</p>
             <form action="" method="POST">
+                <dl>
                     {{ wtf.quick_form(ldapSettings) }}
                 </dl>
-                <dl>
             </form>
     </div>
         <hr width="100%">
