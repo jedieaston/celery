@@ -81,7 +81,12 @@ def groupEvents():
     # Gets you a dictionary of group events and their IDs
     events = {}
     for event in sc.get_events(group_id=settings['reportingGroupID']):
-        events[event.id] = event.title
+        if event.id == "" or None:
+            continue
+        elif event.title == "" or None:
+            continue
+        else:
+            events[str(event.id)] = event.title
     return events
 def importGroupEnrollmentsToDatabase(group_id, db):
     # adds the user identifiers and names to the database for use with reporting

@@ -1,5 +1,5 @@
 from modules.api import schoology
-from modules.dbModels import db, records
+from modules.dbModels import db, records, importedUsers
 import datetime
 import random
 import csv
@@ -8,6 +8,8 @@ import pytz
 import tzlocal
 import time
 import os
+import modules.settings as settings
+
 
 # Get the timezone!!1!
 
@@ -40,7 +42,36 @@ def exportAll():
             outcsv.writerow(row)
     return filePath
 
-
+def attendedEvent(eventID):
+    # Returns a CSV of whether people were there or not on a certain date.
+    # TODO: Make this also be able to use start/end times so it is more accurate.
+    reportResult = []
+    eventDate = datetime.datetime.strptime(schoology.sc.get_event(eventID, group_id=settings.schoology[
+        "reportingGroupID"]).start, "%Y-%m-%d %H:%M:%S").date()
+    for user in importedUsers.query.all():
+        print(user.studentID)
+        recordQuery = records.query.filter_by(studentID=user.studentID)
+        print(recordQuery.count())
+        for result in recordQuery:
+            print(result.timeOut.date())
+            if result.timeOut.date() == eventDate:
+                queryResult = {"studentID": result.studentID, "studentName": result.studentName, "studentAttended": True}
+                break
+            else:
+                continue
+        if queryResult["studentID"] != user.studentID:
+            # variable wasn't overwritten, therefore they were not there on that date.
+            queryResult = {"studentID": user.studentID, "studentName": user.studentName, "studentAttended": False}
+            reportResult.append(queryResult)
+        else:
+            # they were there because it was overwritten.
+            reportResult.append(queryResult)
+    filePath = 'static/reports/attendanceReport-' + datetime.datetime.strftime(eventDate, "%m-%d-%Y") + ".csv"
+    with open(filePath, "w") as reportCSV:
+        writeDict = csv.DictWriter(reportCSV, reportResult[0].keys(), lineterminator='\n')
+        writeDict.writeheader()
+        writeDict.writerows(reportResult)
+    return (filePath)
 def clearFolder():
     # Thanks, https://stackoverflow.com/a/185941 !
     folder = "static/reports/"

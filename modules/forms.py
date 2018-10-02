@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, PasswordField, SubmitField, SelectField
 from wtforms.validators import Length, DataRequired, URL
+from wtforms.fields.html5 import DateField
 from modules import settings
 
 
@@ -47,3 +48,10 @@ class schoology(FlaskForm):
 class schoologyGroupSelector(FlaskForm):
     groupList = SelectField('Default Schoology Group') #Choices are created when the form is instantiated.
     schoologyGroupSelectorSubmit = SubmitField('Submit')
+
+class getAllReports(FlaskForm):
+    getAllReportsSubmit = SubmitField('Submit')
+
+class attendedEventSelector(FlaskForm):
+    eventList = SelectField('Event to run report against.', validators=[DataRequired(message="Pick an event.")])
+    attendedEventSelectorSubmit = SubmitField('Submit')

@@ -1,0 +1,73 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}
+    Celery!
+{% endblock %}
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/styles/css/nav.css">
+{% endblock %}
+
+
+{% block navbar %}
+{{ nav.celeryNav.render() }}
+{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>Reporting</h1>
+    </div>
+    {% if reportLink is not none %}
+        <!--Ewww, iframe! At least I didn't have to use JS, thanks https://stackoverflow.com/a/156715 -->
+        <iframe width="1" height="1" frameborder="0" src="{{ request.url_root + reportLink }}" class="hidden"></iframe>
+        <div class="alert alert-success" role="alert">
+            <i class="fas fa-check"></i>
+             Your requested report was generated. If it did not automatically download, download it <a href="{{
+                request.base_url + reportLink }}">here.</a>
+        </div>
+    {% endif %}
+    {% if schoology.connectionCheck() == False %}
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            You haven't set up Schoology integration!
+            Certain reports are unavailable, unless you fix it <a href="/admin/schoologyconnect">here</a>.
+        </div>
+    {% elif schoology.connectionCheck() == True %}
+        <div class="container">
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check"></i>
+                Schoology connected. Reports will be ran against {{ schoology.schoolGroups()[settings.schoology["reportingGroupID"]] }}.
+           </div>
+        </div>
+
+        <div class="container">
+            <h4>Who attended that Schoology event?</h4>
+                <p>Checks the database to see who checked in on the same day of your Schoology group's
+                event.</p>
+                {% if alertState == "2" %}
+                    <div class="alert alert-info" role="alert">
+                        There are no events in the Schoology group "{{ schoology.schoolGroups()[settings
+                        .schoology["reportingGroupID"]] }}". If you want to change groups, click <a
+                            href="/admin/schoologyconnect"><b>here</b></a>.
+                    </div>
+                {% else %}
+                    <form action="" method="POST">
+                        <dl>
+                            {{ wtf.quick_form(attendedEventSelectorForm) }}
+                        </dl>
+                    </form>
+                {% endif %}
+        </div>
+            <hr width="100%">
+    {% endif %}
+    <div class="container">
+        <h4>Export all records</h4>
+        <p>This dumps the entire records table from the database into a csv file for manual data
+        analysis. It may take a little while depending on how long Celery has been running. Perfect for
+        backup purposes.</p>
+        <!--TODO: Don't generate until button is clicked to lower initial page load time.-->
+        <a href="{{ request.url_root + reports.exportAll() }}" type="button" class="btn btn-primary">Download Report!</a>
+    </div>
+    <hr width="100%">
+{% endblock %}
