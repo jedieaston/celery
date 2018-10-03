@@ -27,7 +27,7 @@
                 request.base_url + reportLink }}">here.</a>
         </div>
     {% endif %}
-    {% if schoology.connectionCheck() == False %}
+    {% if schoology.connectionCheck() == False or settings.schoology["reportingGroupID"] == None %}
         <div class="alert alert-warning" role="alert">
             <i class="fas fa-exclamation-triangle"></i>
             You haven't set up Schoology integration!
@@ -63,7 +63,7 @@
     {% endif %}
     <div class="container">
         <h4>Export all records</h4>
-        <p>This dumps the entire records table from the database into a csv file for manual data
+        <p>This dumps the entire attendanceRecords table from the database into a csv file for manual data
         analysis. It may take a little while depending on how long Celery has been running. Perfect for
         backup purposes.</p>
         <!--TODO: Don't generate until button is clicked to lower initial page load time.-->

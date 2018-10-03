@@ -5,11 +5,11 @@ import yaml
 
 defaultSettings = {'ldap': {'ldapAvailable': True, 'ldapServer': 'example.com', 'ldapAccessDomain': 'example',
                             'ldapAccessUserName': 'Unprivileged', 'ldapAccessPassword': 'Passw0rd!',
-                            'ldapSearchBase': 'DC=example, DC=com', 'ldapAuthenticationStandard': 'NTLM'},
-                   'general': {'signIn': True}, 'db': {'url': 'postgres+psycopg2://postgres:celery@db:5432/celerydb'},
-                   'schoology': {'instanceUrl': 'xaviersschool.schoology.com', 'apiKey': 'buymeatendiesub',
-                                 'apiSecret': 'skdfjlasfaslaksdlaslasfasflkasdkf3e4rijowejrf', 'requestLimit': '5000'},
-                   'dev': {'debug': True}}
+                            'ldapSearchBase': 'DC=example, DC=com'},
+                   'general': {'signIn': False}, 'db': {'url': 'postgres+psycopg2://postgres:celery@db:5432/celerydb'},
+                   'schoology': {'instanceUrl': 'xaviersschool.schoology.com', 'apiKey': '',
+                                 'apiSecret': '', 'requestLimit': '5000'},
+                   'dev': {'debug': False}}
 
 
 def updateSettingsDicts(**kwargs):

@@ -16,19 +16,35 @@
 
 {% block content %}
     <div class="container">
+        <!-- Check if they never set up Schoology or AD integration -->
+        {% if settings.schoology['apiKey'] == "" and ldapConnect.ldapConnection == False %}
+            <div class="alert alert-danger" role="alert">
+                <p><i class="fas fa-exclamation-triangle"></i>   No name recognition services are available. Check to
+                    make sure your <a href="/admin/settings">settings</a> are correct, and restart Celery. </p>
+            </div>
+        {% endif %}
         {% if alertState == "0" %}
 
         {% elif alertState == "1" %}
-            <div class="alert alert-success" role="alert">
-                Sign-in for {{ lastCheckedUser }} was successful!
-            </div>
+            {% if lastCheckedUser == "Unknown" %}
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-user-secret"></i>  Sign-in for the last person was successful, but we couldn't
+                    figure out their name.
+                </div>
+            {% else %}
+                <div class="alert alert-success" role="alert">
+                   <i class="fas fa-user-check"></i>  Sign-in for {{ lastCheckedUser }} was successful!
+                </div>
+            {% endif %}
         {% elif alertState == "2" %}
             <div class="alert alert-danger" role="alert">
-                We could not record your sign in. Contact your favorite IT Intern so he can fix it.
+                <!-- if the database went down -->
+                <i class="fas fa-exclamation-triangle"></i>  We could not record your sign in. Contact your favorite
+                IT Intern so he can fix it.
             </div>
         {% elif alertState == "4" %}
             <div class="alert alert-danger" role="alert">
-                Sign-in prompt overridden. This incident has been recorded.
+                <i class="fas fa-user-alt-slash"></i>  Sign-in prompt overridden. This incident has been recorded.
             </div>
         {% endif %}
         <form method="post" action="{{ url_for('home') }}">
