@@ -1,5 +1,5 @@
 from modules.api import schoology
-from modules.dbModels import db, records, importedUsers
+from modules.dbModels import db, attendanceRecords, importedUsers
 import datetime
 import random
 import csv
@@ -9,21 +9,20 @@ import tzlocal
 import time
 import os
 import modules.settings as settings
-
-
+from sqlalchemy import func
 # Get the timezone!!1!
 
 localTz = tzlocal.get_localzone()
 
 
 def exportAll():
-    # Exports the records table from the db to a csv in static, then spits out the link.
+    # Exports the attendanceRecords table from the db to a csv in static, then spits out the link.
     filePath = 'static/reports/exportAll-' + ''.join(
         random.choice(string.ascii_lowercase + string.digits) for _ in range(9)) + ".csv"
-    dbQuery = records.query.all()
+    dbQuery = attendanceRecords.query.all()
     with open(filePath, 'w') as csvFile:
         outcsv = csv.writer(csvFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header = records.__table__.columns.keys()
+        header = attendanceRecords.__table__.columns.keys()
         outcsv.writerow(header)
         for record in dbQuery:
             row = []
@@ -49,9 +48,7 @@ def attendedEvent(eventID):
     eventDate = datetime.datetime.strptime(schoology.sc.get_event(eventID, group_id=settings.schoology[
         "reportingGroupID"]).start, "%Y-%m-%d %H:%M:%S").date()
     for user in importedUsers.query.all():
-        print(user.studentID)
-        recordQuery = records.query.filter_by(studentID=user.studentID)
-        print(recordQuery.count())
+        recordQuery = attendanceRecords.query.filter_by(studentID=user.studentID)
         for result in recordQuery:
             print(result.timeOut.date())
             if result.timeOut.date() == eventDate:
@@ -66,7 +63,22 @@ def attendedEvent(eventID):
         else:
             # they were there because it was overwritten.
             reportResult.append(queryResult)
-    filePath = 'static/reports/attendanceReport-' + datetime.datetime.strftime(eventDate, "%m-%d-%Y") + ".csv"
+      # This is code to append people that signed in with names that were gathered from AD, to get around a Schoology
+      #  API bug that exists at a moment. This will be removed eventually.
+    adResults = []
+    for user in attendanceRecords.query.filter(func.DATE(attendanceRecords.timeOut) == eventDate,
+                                               attendanceRecords.nameFrom == "AD"):
+        # They were not imported to the db from schoology, but that may be because of the Schoology API bug,
+        # so we'll add them
+        #  to the report
+        if user.studentID in adResults:
+            continue
+        else:
+            adResults.append(user.studentID)
+            record = {"studentID": user.studentID, "studentName": user.studentName, "studentAttended": True}
+            reportResult.append(record)
+    filePath = 'static/reports/attendanceReport-' + schoology.sc.get_event(eventID, group_id=settings.schoology[
+        "reportingGroupID"]).title.replace(" ", "_") + ".csv"
     with open(filePath, "w") as reportCSV:
         writeDict = csv.DictWriter(reportCSV, reportResult[0].keys(), lineterminator='\n')
         writeDict.writeheader()

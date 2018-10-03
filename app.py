@@ -1,4 +1,4 @@
-from modules import settings, recorder, reports
+from modules import settings, recorder, reports, ldapConnect
 from flask import Flask, render_template, redirect, url_for, session, request, Response
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
@@ -72,7 +72,8 @@ def home():
     else:
         alertState == "0"
         lastCheckedUser= None
-    return render_template("index.html", form=form, alertState=alertState, lastCheckedUser=lastCheckedUser)
+    return render_template("index.html", form=form, alertState=alertState, lastCheckedUser=lastCheckedUser,
+                           settings=settings, ldapConnect=ldapConnect)
 
 @app.route('/admin')
 def admin():
@@ -191,6 +192,7 @@ def settingsEditor():
 
     # TODO: Find a better way to do this. Maybe it's just to make one form. I don't know.
     if genSet.generalSubmitButton.data and genSet.validate():
+        ldapWanted = ldapConnect.ldapAvailable
         try:
             settings.updateSettingsDicts(general = genSet.data)
             settingsLastSaved = "General"
@@ -204,7 +206,13 @@ def settingsEditor():
             settingsSaved = True
         except:
             settingsSaved = False
+        if ldapSet.ldapAvailable.data == True:
+            # They wanted AD so lets try to reconnect to AD.
+            ldapConnect.ldapAvailable, ldapConnect.ldapConnection == ldapConnect.ldapSetUp()
+            ldapWanted = True
+
     elif schoologySet.schoologySubmitButton.data and schoologySet.validate():
+        ldapWanted=ldapConnect.ldapAvailable
         try:
             settings.updateSettingsDicts(schoology = schoologySet.data)
             settingsLastSaved = "Schoology"
@@ -215,9 +223,10 @@ def settingsEditor():
         # They didn't submit anything.
         settingsSaved = None
         settingsLastSaved = None
+        ldapWanted = ldapConnect.ldapAvailable
     return render_template("admin/settings.html", generalSettings=genSet, ldapSettings=ldapSet,
                            schoologySettings=schoologySet, settingsSaved=settingsSaved,
-                           settingsLastSaved=settingsLastSaved)
+                           settingsLastSaved=settingsLastSaved, ldapWanted=ldapWanted, ldapConnect=ldapConnect)
 
 if settings.dev["debug"] == True:
     import pprint

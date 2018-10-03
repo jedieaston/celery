@@ -1,6 +1,6 @@
 import csv
 from modules import ldapConnect
-from modules.dbModels import records, importedUsers
+from modules.dbModels import attendanceRecords, importedUsers
 import datetime
 from modules.api.schoology import connectionCheck # To see if we can get names from schoology.
 
@@ -13,18 +13,23 @@ def signOut(idNumber):
         try:
             studentIDQuery = importedUsers.query.filter_by(studentID="s" + str(idNumber))
             studentName = studentIDQuery[0].studentName
+            nameFrom = "Schoology"
         except:
             # They must not be in the group.
             studentName = "Unknown"
+            nameFrom = "Unknown"
     elif ldapConnect.ldapAvailable == True:
         try:
             studentName = ldapConnect.getStudentName(idNumber)
+            nameFrom = "AD"
         except:
             studentName = "Unknown"
+            nameFrom = "Unknown"
     else:
         studentName = "Unknown"
-    newRecord = records(studentID="s" + idNumber, studentName=studentName,
-                        timeOut=datetime.datetime.today())
+        nameFrom = "Unknown"
+    newRecord = attendanceRecords(studentID="s" + idNumber, studentName=studentName,
+                                  timeOut=datetime.datetime.today(), nameFrom=nameFrom)
     return newRecord
 
 def signIn(record, db, override):
@@ -41,24 +46,31 @@ def signInNoOut(idNumber, db):
         try:
             studentIDQuery = importedUsers.query.filter_by(studentID="s" + str(idNumber))
             studentName = studentIDQuery[0].studentName
+            nameFrom = "Schoology"
         except:
             # They must not be in the group.
             if ldapConnect.ldapAvailable == True:
                 try:
                     studentName = ldapConnect.getStudentName(idNumber)
+                    nameFrom = "AD"
                 except:
                     studentName = "Unknown"
+                    nameFrom = "Unknown"
             else:
                 studentName = "Unknown"
+                nameFrom = "Unknown"
     elif ldapConnect.ldapAvailable == True:
         try:
             studentName = ldapConnect.getStudentName(idNumber)
+            nameFrom = "AD"
         except:
             studentName = "Unknown"
+            nameFrom = "Unknown"
     else:
         studentName = "Unknown"
-    newRecord = records(studentID="s" + idNumber, studentName=studentName,
-                        timeOut=datetime.date.today(), overridden=False)
+        nameFrom = "Unknown"
+    newRecord = attendanceRecords(studentID="s" + idNumber, studentName=studentName,
+                                  timeOut=datetime.date.today(), overridden=False, nameFrom=nameFrom)
     db.session.add(newRecord)
     db.session.commit()
     return studentName

@@ -17,12 +17,21 @@
     <h1>Settings</h1>
         <p>You know, where you change stuff.</p>
     {% if settingsSaved == True %}
-        <div class="alert alert-success" role="alert">
-            {{ settingsLastSaved }} settings saved successfully! Restart Celery for the changes to take effect!
-        </div>
+        {% if ldapWanted == True and ldapConnect.ldapAvailable == False %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-user-slash"></i>  We cannot connect to your Active Directory Domain. Check your
+                    settings and try again.
+            </div>
+        {% else %}
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check"></i>  {{ settingsLastSaved }} settings saved successfully! Restart Celery for
+                the changes to take effect!
+            </div>
+        {% endif %}
     {% elif settingsSaved == False %}
         <div class="alert alert-danger" role="alert">
-            We couldn't save your settings changes. Something is wrong. Call your favorite support person.
+            <i class="fas fa-times"></i>  We couldn't save your settings changes. Something is wrong. Call your
+            favorite support person.
         </div>
     {% elif settingsSaved == None %}
 

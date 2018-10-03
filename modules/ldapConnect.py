@@ -9,9 +9,10 @@ def ldapSetUp():
             ldapConnection = Connection(directoryServer, auto_bind=True,
                                         user=settings.ldap["ldapAccessDomain"] + "\\" + settings.ldap["ldapAccessUserName"],
                                         password=settings.ldap["ldapAccessPassword"],
-                                        authentication=settings.ldap["ldapAuthenticationStandard"])
+                                        authentication=NTLM)
             return True, ldapConnection
-        except:
+        except Exception as e:
+            print(e)
             print("Can't connect to your Active Directory domain! Check your configuration.")
             return False, None
     else:
