@@ -11,7 +11,7 @@ import modules.api.schoology as schoology
 from flask_session import Session
 app = Flask(__name__)
 # Change this in prod...
-app.config['SECRET_KEY'] = '84328weyrs78sa78asd76f76sdf56asd75632472y8huiasdfh347924h174y43792hg23r4y77y73247bc'
+app.config['SECRET_KEY'] = "b'@]\\t\\x97a\\xa2\\xf5\\x02<<\\x9dc\\x10:f\\xd3k\\xfb7\\xcb\\x1f0{G'"
 
 # Flask-SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = settings.db["url"]
@@ -22,7 +22,6 @@ app.config["SESSION_TYPE"] = 'sqlalchemy'
 app.config['SESSION_SQLALCHEMY'] = db
 
 Session(app)
-
 # Setup flask plugins....
 try:
     with app.app_context():

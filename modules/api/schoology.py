@@ -67,7 +67,6 @@ def devConnect():
     return sc
 def showMe():
     # More of a test, gives information about the user logged in,
-    sc.limit = 5
     me = sc.get_me()
     me = me.name_display
     return me
