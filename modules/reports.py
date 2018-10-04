@@ -87,13 +87,17 @@ def attendedEvent(eventID):
 def clearFolder():
     # Thanks, https://stackoverflow.com/a/185941 !
     folder = "static/reports/"
+    print(os.getcwd())
     for file in os.listdir(folder):
         filePath = os.path.join(folder, file)
         try:
             if os.path.isfile(filePath):
                 os.unlink(filePath)
         except:
-            print("Uhh, we couldn't clear the reports folder. Something may be up with the filesystem...")
+            try:
+                os.mkdirs(folder)
+            except:
+                print("Uhh, we couldn't set up the reports folder. Something may be up with the filesystem...")
 
 
 # Runs on import to make sure we keep the folder tidy, since the reports can be regenerated as long as the database is
