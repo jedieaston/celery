@@ -1,5 +1,5 @@
 from modules import settings
-from ldap3 import Server, Connection, ALL, NTLM, ALL_ATTRIBUTES
+from ldap3 import Server, Connection, ALL, NTLM, ALL_ATTRIBUTES, RESTARTABLE
 
 
 def ldapSetUp():
