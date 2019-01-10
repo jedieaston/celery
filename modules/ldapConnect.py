@@ -9,7 +9,7 @@ def ldapSetUp():
             ldapConnection = Connection(directoryServer, auto_bind=True,
                                         user=settings.ldap["ldapAccessDomain"] + "\\" + settings.ldap["ldapAccessUserName"],
                                         password=settings.ldap["ldapAccessPassword"],
-                                        authentication=NTLM)
+                                        authentication=NTLM, client_strategy=RESTARTABLE)
             return True, ldapConnection
         except Exception as e:
             print(e)
